@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui-timepicker-addon.css' %}">
+</head>
+<body>
+<div class="container text-center mb-5">
+    <h1 class="alert-success text center" style="color:red;background-color:aqua;">Fill Form</h1>
+    <div class="row">
+        <div class="col-sm-12">
+            <form  method="post" id="CVForm" data-course-url="{% url 'course' %}"  >
+                {% csrf_token %}
+                {% for fm in form %}
+                <div class="form-group mb-3">
+                    {{fm.label_tag}} {{fm}} <small class="text-danger">{{fm.errors|striptags}}</small>
+                </div>
+                {% endfor %}
+                <input type="submit" value="Submit" class="btn btn-primary">
+                {% if form.non_field_errors %}
+                  {% for error in form.non_field_errors %}
+                   <p class="alert alert-danger my-3">{{error}}</p>
+                  {% endfor %}
+                {% endif %}
+                <div>
+                    <button class="btn btn-primary"><a href="/register/logout" style="color:black;background-color:yellow;">Logout</a></button>
+                </div>
+                <div>
+                    {% for msg in messages %}
+                        {{msg}}
+                    {% endfor %}
+                </div>
+                <div>
+                    <button class="btn btn-primary"><a href="{% url 'storeapp:home' %}" style="color:red;">Back to Home</a></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="{% static 'jquery-ui.js' %}"></script>
+<script src="{% static 'jquery-ui-timepicker-addon.js' %}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $( function() {
+        $( "#id_dob" ).datepicker({ dateFormat: 'yy-mm-dd'}).attr("autocomplete","off") ;
+    });
+</script>
+
+<script>
+    $("#id_department").change(function () {
+        const url = $("#CVForm").attr("data-course-url");  // get the url of the `load_cities` view
+        const departmentId = $(this).val();  // get the selected country ID from the HTML input
+
+        $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request (= /persons/ajax/load-cities/ )
+            data: {
+                'department_id': departmentId       // add the country id to the GET parameters
+            },
+            success: function (data) {   // `data` is the return of the `load_cities` view function
+                console.log(data)
+                $("#id_course").html(data);  // replace the contents of the city input with the data that came from the server
+
+
+                let html_data = '<option value="">---------</option>';
+                data.forEach(function (course) {
+                    html_data += `<option value="${course.id}">${course.name}</option>`
+                });
+                console.log(html_data);
+                $("#id_course").html(html_data);
+
+
+            }
+        });
+
+    });
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+</body>
+</html>
